@@ -1,1 +1,6 @@
-
+{
+  "appId": "com.almas.gensafe",
+  "appName": "GenSafe",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
