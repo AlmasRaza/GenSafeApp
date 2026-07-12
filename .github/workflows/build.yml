@@ -1,0 +1,56 @@
+name: Build GenSafe Android App
+
+# یہ ورک فلو کب چلے گا؟ (جب بھی آپ کوڈ پش کریں گے یا خود بٹن دبائیں گے)
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. آپ کا سارا کوڈ گٹ ہب سرور پر لانا
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # 2. جاوا اسکرپٹ (Node.js) کا ماحول تیار کرنا
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    # 3. ضروری پیکیجز اور Capacitor انسٹال کرنا
+    - name: Install Dependencies
+      run: |
+        npm install
+        npm install @capacitor/core @capacitor/cli @capacitor/android
+
+    # 4. اینڈرائیڈ ایپ کا سانچہ بنانا اور آپ کا www فولڈر اس میں ڈالنا
+    - name: Initialize & Sync Capacitor Android
+      run: |
+        npx cap add android || echo "Android platform already added"
+        npx cap sync android
+
+    # 5. ایپ بنانے کے لیے جاوا (Java) کا ماحول تیار کرنا
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # 6. اینڈرائیڈ کی فائنل APK فائل تیار کرنا
+    - name: Build APK (Assemble Debug)
+      working-directory: ./android
+      run: |
+        chmod +x ./gradlew
+        ./gradlew assembleDebug
+
+    # 7. تیار شدہ APK کو ڈاؤنلوڈ کے لیے فراہم کرنا
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: GenSafe-Offline-App
+        path: android/app/build/outputs/apk/debug/app-debug.apk
