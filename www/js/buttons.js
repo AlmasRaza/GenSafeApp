@@ -88,48 +88,75 @@ function deleteAccount() {
 // ---------------------------------------------------------
 
 async function exportDatabase() {
-    let {pass, pin} = getInputs();
-    if(!pass || !pin) return alert("Master Password and PIN are required for securely encrypting your vault.");
-    if (currentDatabase.length === 0) return alert("Database is empty. Nothing to export.");
-
-    // ڈیٹا کو انکرپٹ کریں
-    let key = await deriveAESKey(pass, pin);
-    let encStr = await encryptData(JSON.stringify(currentDatabase), key);
-    let jsonString = JSON.stringify({data: encStr}, null, 2);
-
-    // فائل آبجیکٹ شیئرنگ کے لیے
-    let file = new File([jsonString], "my_gensafe_vault.json", { type: "application/json" });
-
-    // 1. نیا طریقہ: Web Share API (اگر براؤزر/ایپ سپورٹ کرے)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-            await navigator.share({
-                title: 'GenSafe Vault',
-                text: 'Here is my securely encrypted GenSafe vault.',
-                files: [file]
-            });
-            logToUI(`💾 Vault Shared! Secured ${currentDatabase.length} account(s).`, 'log-info');
-            return; // اگر شیئر ہو گیا تو فنکشن یہیں رک جائے گا
-        } catch (err) {
-            console.log("Share failed or cancelled:", err);
-        }
+    if (currentDatabase.length === 0) {
+        alert("⚠️ Vault is empty!");
+        return;
     }
 
-    // 2. پرانا اور مضبوط طریقہ: Fallback (اگر شیئر مینو فیل ہو جائے)
-    let a = document.createElement('a');
-    a.href = "data:text/json;charset=utf-8," + encodeURIComponent(jsonString);
-    a.download = "my_gensafe_vault.json";
-    document.body.appendChild(a); 
-    a.click(); 
-    a.remove();
-    
-    logToUI(`💾 Vault Downloaded! Secured ${currentDatabase.length} account(s) using AES-256.`, 'log-info');
-    
-    // ایک الرٹ تاکہ اگر ویب ویو فائل بلاک کرے تو یوزر کو پتہ چل جائے
-    setTimeout(() => {
-        alert("اگر فائل ڈاؤنلوڈ یا شیئر نہیں ہوئی، تو آپ کی ایپ کا براؤزر ڈاؤنلوڈنگ کو روک رہا ہے۔ براہ کرم اس (GenSafe) کو نارمل گوگل کروم میں کھولیں۔");
-    }, 500);
+    let mPass = document.getElementById('masterPass').value;
+    let mPin = document.getElementById('masterPin').value;
+    if (!mPass || !mPin) {
+        alert("⚠️ Please enter Master Password and PIN to lock the vault.");
+        return;
+    }
+
+    try {
+        // انکرپشن کا عمل (AES-256)
+        let dataStr = JSON.stringify(currentDatabase);
+        let key = await deriveAESKey(mPass, mPin);
+        let encryptedStr = await encryptData(dataStr, key);
+        
+        let finalJson = JSON.stringify({ data: encryptedStr });
+        let fileName = `GenSafe_Vault_${new Date().getTime()}.json`;
+
+        // 🌟 نیا کیپیسیٹر (Native Android) طریقہ
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            const { Filesystem, Share } = Capacitor.Plugins;
+            
+            // 1. فائل کو ایپ کی محفوظ عارضی میموری (CACHE) میں بنائیں
+            const result = await Filesystem.writeFile({
+                path: fileName,
+                data: finalJson,
+                directory: 'CACHE', 
+                encoding: 'utf8'
+            });
+
+            // 2. اینڈرائیڈ کی اصلی شیئر اسکرین کھولیں
+            await Share.share({
+                title: 'GenSafe Vault Backup',
+                text: 'Here is your highly secure offline GenSafe vault backup file.',
+                url: result.uri,
+                dialogTitle: 'Save or Share Vault'
+            });
+            
+            logToUI(`💾 Vault Shared securely using Native Android!`, 'log-info');
+
+        } 
+        // 🌐 پرانا براؤزر (Web) کا طریقہ (اگر کبھی کمپیوٹر کروم پر چلائیں)
+        else {
+            let blob = new Blob([finalJson], { type: 'application/json' });
+            let url = URL.createObjectURL(blob);
+            
+            if (navigator.share) {
+                let file = new File([blob], fileName, { type: 'application/json' });
+                await navigator.share({ title: 'GenSafe Vault Backup', files: [file] });
+                logToUI(`💾 Vault Shared!`, 'log-info');
+            } else {
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                logToUI(`💾 Vault Downloaded!`, 'log-info');
+            }
+        }
+    } catch (err) {
+        console.error("Export Error:", err);
+        alert("❌ Error saving file: " + err.message);
+    }
 }
+
 
 
 function flushMemory() {
