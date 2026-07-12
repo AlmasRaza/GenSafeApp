@@ -1,44 +1,44 @@
-        * { box-sizing: border-box; }
-        :root { --primary: #2c3e50; --accent: #27ae60; --info: #2980b9; --warning: #f39c12; --danger: #e74c3c; --bg: #f4f7f6; }
-        
-        /* Layout Fix: Margin and Padding removed to stop scrolling/gaps */
-        body { 
-            font-family: -apple-system, sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            padding: 0; 
-            height: 100dvh; 
-            overflow: hidden; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-        }
-        
-        /* Container fits the screen */
-        .container { 
-            width: 100%; 
-            max-width: 400px; 
-            height: 100dvh; 
-            background: #fff; 
-            padding: 15px; 
-            overflow-y: auto; 
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-        
-        h2 { text-align: center; color: var(--primary); font-size: 1.4rem; margin: 5px 0 15px 0; }
-        
-        .input-group { position: relative; margin-bottom: 15px; }
-        .input-group input { width: 100%; padding: 12px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-        .input-group label { position: absolute; left: 10px; top: 12px; font-size: 12px; color: #7f8c8d; transition: 0.2s; pointer-events: none; background: #fff; padding: 0 4px; }
-        .input-group input:focus + label, .input-group input:not(:placeholder-shown) + label { top: -8px; font-size: 10px; color: var(--primary); font-weight: bold; }
-        
-        .row { display: flex; gap: 8px; }
-        .btn-group { display: flex; gap: 5px; margin-bottom: 10px; }
-        .btn-group button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 18px; }
-        
-        .checkbox-container {
+* { box-sizing: border-box; }
+:root { --primary: #2c3e50; --accent: #27ae60; --info: #2980b9; --warning: #f39c12; --danger: #e74c3c; --bg: #f4f7f6; }
+
+/* Layout Fix: Margin and Padding removed to stop scrolling/gaps */
+body { 
+    font-family: -apple-system, sans-serif; 
+    background: var(--bg); 
+    margin: 0; 
+    padding: 0; 
+    height: 100dvh; 
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+/* Container fits the screen */
+.container { 
+    width: 100%; 
+    max-width: 400px; 
+    height: 100dvh; 
+    background: #fff; 
+    padding: 15px; 
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+h2 { text-align: center; color: var(--primary); font-size: 1.4rem; margin: 5px 0 15px 0; }
+
+.input-group { position: relative; margin-bottom: 15px; }
+.input-group input { width: 100%; padding: 12px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+.input-group label { position: absolute; left: 10px; top: 12px; font-size: 12px; color: #7f8c8d; transition: 0.2s; pointer-events: none; background: #fff; padding: 0 4px; }
+.input-group input:focus + label, .input-group input:not(:placeholder-shown) + label { top: -8px; font-size: 10px; color: var(--primary); font-weight: bold; }
+
+.row { display: flex; gap: 8px; }
+.btn-group { display: flex; gap: 5px; margin-bottom: 10px; }
+.btn-group button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 18px; }
+
+.checkbox-container {
     display: grid;
     grid-template-columns: 1fr 1fr; /* دو کالمز */
     gap: 2px 5px; /* آپس میں فاصلہ انتہائی کم */
@@ -61,7 +61,42 @@
     transform: scale(0.9); /* چیک باکس کا سائز بھی تھوڑا چھوٹا */
 }
 
+.log-container { 
+    flex-grow: 1; 
+    min-height: 80px; 
+    overflow-y: auto; 
+    font-size: 11px; 
+    background: #f9f9f9; 
+    padding: 5px; 
+    border: 1px solid #eee; 
+    border-radius: 5px; 
+    margin-bottom: 10px; 
+    word-break: break-all; 
+}
 
-        
-        .log-container { flex-grow: 1; min-height: 80px; overflow-y: auto; font-size: 11px; background: #f9f9f9; padding: 5px; border: 1px solid #eee; border-radius: 5px; margin-bottom: 10px; word-break: break-all; }
-        .btn-export { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+.btn-export { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+
+/* --- نئی شامل کی گئی کلاسز (script.js کے مطابق) --- */
+
+.log-entry {
+    white-space: pre-wrap; /* سب سے اہم: یہ \n کو پڑھ کر لائن توڑے گا */
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #ddd; /* ریکارڈز کو الگ دکھانے کے لیے ایک ہلکی سی لائن */
+}
+
+.log-entry:last-child {
+    border-bottom: none; /* آخری ریکارڈ کے نیچے لائن ختم کرنے کے لیے */
+}
+
+.log-info {
+    color: var(--info); /* کامیابی کے میسجز کے لیے نیلا رنگ */
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.log-default {
+    color: #333; /* عام اکاؤنٹس اور پاس ورڈز دکھانے کے لیے ڈارک گرے رنگ */
+    line-height: 1.4;
+}
