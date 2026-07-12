@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GenSafe - Offline Password Manager</title>
+    <meta name="theme-color" content="#2c3e50">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
 
+<div class="container">
+    <h2>GenSafe</h2>
+    <input type="file" id="dbFile" accept=".json, application/json, text/plain, */*" style="font-size: 11px; margin-bottom: 10px; width: 100%;">
+
+    <div class="row">
+        <div class="input-group" style="flex:1"><input type="password" id="masterPass" placeholder=" "><label>Master Pass</label></div>
+        <div class="input-group" style="flex:1"><input type="password" id="masterPin" placeholder=" "><label>Master PIN</label></div>
+    </div>
+
+    <div class="input-group"><input type="text" id="accountName" placeholder=" "><label>Account Name</label></div>
+
+    <div class="row">
+        <div class="input-group" style="flex:1"><input type="number" id="passLength" value="16" min="1" max="64" placeholder=" "><label>Len</label></div>
+        <div class="input-group" style="flex:2"><input type="text" id="allowedSymbols" value="!@#$%^&*" placeholder=" "><label>Symbols</label></div>
+    </div>
+
+    <div class="checkbox-container">
+    <label class="checkbox-label"><input type="checkbox" id="mustInclude"> ✅ Require All (Upper, Num, Sym)</label>
+    <label class="checkbox-label"><input type="checkbox" id="onlyNumbers"> 🔢 Only Num</label>
+    <label class="checkbox-label"><input type="checkbox" id="startUpper"> 🅰️ Start with Capital</label>
+    <label class="checkbox-label"><input type="checkbox" id="includeSpaces"> ␣ Include Spaces</label>
+    <label class="checkbox-label"><input type="checkbox" id="noConsecUpper"> 🚫 No Consecutive Capitals</label>
+    <label class="checkbox-label"><input type="checkbox" id="noConsecNum"> 🚫 No Consecutive Num</label>
+    <label class="checkbox-label"><input type="checkbox" id="noConsecSym"> 🚫 No Consecutive Sym</label>
+    <label class="checkbox-label"><input type="checkbox" id="noDupChars"> 🚫 No Duplicate Letters</label>
+    <label class="checkbox-label"><input type="checkbox" id="noDupNums"> 🚫 No Duplicate Num</label>
+    <label class="checkbox-label"><input type="checkbox" id="noDupSyms"> 🚫 No Duplicate Sym</label>
+</div>
+
+
+    <div class="btn-group">
+        <button style="background:#27ae60" onclick="addAccount()">➕</button>
+        <button style="background:#2980b9" onclick="searchAccount()">🔍</button>
+        <button style="background:#f39c12" onclick="updateAccount()">🔄</button>
+        <button style="background:#e74c3c" onclick="deleteAccount()">🗑️</button>
+    </div>
+
+    <div id="outputLog" class="log-container"></div>
+    <button class="btn-export" onclick="exportDatabase()">Save Vault</button>
+    <button style="width:100%; border:none; background:none; color:#7f8c8d; font-size:10px; margin-top:5px;" onclick="flushMemory()">Flush Memory</button>
+</div>
+
+<script src="js/buttons.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/generator.js"></script>
+<script src="js/script.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
