@@ -1,6 +1,5 @@
 name: Build GenSafe Android App
 
-# یہ ورک فلو کب چلے گا؟ (جب بھی آپ کوڈ پش کریں گے یا خود بٹن دبائیں گے)
 on:
   push:
     branches: [ main, master ]
@@ -22,33 +21,46 @@ jobs:
       with:
         node-version: '20'
 
-    # 3. ضروری پیکیجز اور Capacitor انسٹال کرنا
+    # 3. ضروری پیکیجز، فائل سسٹم، شیئرنگ اور آئیکون جنریٹر انسٹال کرنا
     - name: Install Dependencies
       run: |
         npm install
-        npm install @capacitor/core @capacitor/cli @capacitor/android
+        npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/filesystem @capacitor/share
+        npm install @capacitor/assets --save-dev
 
-    # 4. اینڈرائیڈ ایپ کا سانچہ بنانا اور آپ کا www فولڈر اس میں ڈالنا
-    - name: Initialize & Sync Capacitor Android
+    # 4. اینڈرائیڈ ایپ کا سانچہ بنانا
+    - name: Initialize Capacitor Android
       run: |
         npx cap add android || echo "Android platform already added"
-        npx cap sync android
 
-    # 5. ایپ بنانے کے لیے جاوا (Java) کا ماحول تیار کرنا
+    # 5. 🌟 نیا قدم: آپ کا آئیکون اور اسپلیش اسکرین بنانا
+    - name: Generate App Icons and Splash Screen
+      run: |
+        mkdir -p assets
+        # آپ کے 512px آئیکون کو مین فولڈر میں کاپی کر کے اس سے تمام اینڈرائیڈ آئیکونز بنائے جائیں گے
+        cp www/icons/icon-512.png assets/icon.png
+        cp www/icons/icon-512.png assets/splash.png
+        npx @capacitor/assets generate --android
+
+    # 6. آپ کی فائلز (اور نئے آئیکونز) کو اینڈرائیڈ میں سنک (Sync) کرنا
+    - name: Sync Capacitor Android
+      run: npx cap sync android
+
+    # 7. ایپ بنانے کے لیے جاوا (Java) کا ماحول تیار کرنا
     - name: Setup Java JDK
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # 6. اینڈرائیڈ کی فائنل APK فائل تیار کرنا
+    # 8. اینڈرائیڈ کی فائنل APK فائل تیار کرنا
     - name: Build APK (Assemble Debug)
       working-directory: ./android
       run: |
         chmod +x ./gradlew
         ./gradlew assembleDebug
 
-    # 7. تیار شدہ APK کو ڈاؤنلوڈ کے لیے فراہم کرنا
+    # 9. تیار شدہ APK کو ڈاؤنلوڈ کے لیے فراہم کرنا
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
